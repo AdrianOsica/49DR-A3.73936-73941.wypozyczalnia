@@ -12,8 +12,9 @@ namespace wypo
 
 
             Console.WriteLine("Witamy w salonie samochodowym \n");
+            start:
             Console.WriteLine("Wybierz jedna z poninzszych opcji: \n");
-            Console.WriteLine("1. Znajdz samochod \n2.Dodaj samochod ");
+            Console.WriteLine("1. Znajdz samochod \n2. Dodaj samochod ");
             back:
             string choose = Console.ReadLine();
 
@@ -24,7 +25,9 @@ namespace wypo
                     ft.search();
                     break;
                 case "2":
-                    ft.add();
+                    if(ft.add()){
+                        goto start; 
+                    }
                     break;
 
 
