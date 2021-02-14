@@ -23,7 +23,11 @@ namespace Functions
 
 
         }
-        public void search(){
+        public bool search(bool check){
+            
+            if(check){
+                return true;
+            }
 
             Console.Clear();
 
@@ -58,7 +62,7 @@ namespace Functions
 
                 Console.WriteLine("Nie odnaleziono samochodu spelniajacego kryteria");
                 Thread.Sleep(4000);
-                search();
+                search(false);
             }
 
             Console.WriteLine("Wybierz numer samochodu");
@@ -66,6 +70,8 @@ namespace Functions
             con.Close();
 
             inter_car(id_car);
+
+            return false;
 
         }
 
@@ -128,12 +134,12 @@ namespace Functions
 
                 case "1":
                     if(buy(id)){
-                        search();
+                        search(true);
                     }
                     break;
                 case "2":
                     if(rent(id,rdr.GetString(6))){
-                        search();
+                        search(true);
                     }
                     break;
 
@@ -213,6 +219,86 @@ namespace Functions
 
             return true;
 
+        }
+
+        public bool edit(){
+
+            Console.Clear();
+            Console.WriteLine("Edytowanie\n");
+            using var con = new MySqlConnection(connectmysql());
+            con.Open();
+
+            string sql = ($"SELECT * FROM car");
+            using var cmd = new MySqlCommand(sql, con);
+
+            using(MySqlDataReader rdr = cmd.ExecuteReader()){
+
+                while (rdr.Read())
+                {
+                        
+                    Console.WriteLine("{0}. {1} {2} {3} rok {4} km {5} zl {6} zl {7} ",rdr.GetString(0), rdr.GetString(1), rdr.GetString(2), rdr.GetString(3),rdr.GetString(4),rdr.GetString(5),rdr.GetString(6), rdr.GetString(7)  );
+                    
+                }
+
+            }
+
+            Console.WriteLine("Podaj numer samochodu do edytowania");
+            string id=Console.ReadLine();
+            start:
+            Console.WriteLine("\nCo chcesz edytowac?");
+            Console.WriteLine("1. Przebieg\n2. Cena zakupu\n3. Cena wynajmu\n4. Status\n\n5. Wyjdz");
+            string choose=Console.ReadLine();
+
+            string sql_1="";
+
+            switch(choose){
+
+                case "1":
+                    Console.WriteLine("Podaj aktualny przebieg");
+                    string przebieg=Console.ReadLine();
+                    sql_1 = ($"UPDATE `car` SET `przebieg` = '{przebieg}' WHERE `car`.`id` = '{id}';");
+                    Console.WriteLine("Edytowano");
+                    Thread.Sleep(4000);
+                    Console.Clear();
+                    break;
+                case "2":
+                    Console.WriteLine("Podaj aktualna cene zakupu");
+                    string cena_kupna=Console.ReadLine();
+                    sql_1 = ($"UPDATE `car` SET `Cena_kupna` = '{cena_kupna}' WHERE `car`.`id` = '{id}';");
+                    Console.WriteLine("Edytowano");
+                    Thread.Sleep(4000);
+                    Console.Clear();
+                    break;
+                case "3":
+                    Console.WriteLine("Podaj aktualna cene wynajmu");
+                    string cena_wynajmu=Console.ReadLine();
+                    sql_1 = ($"UPDATE `car` SET `Cena_wynajmu` = '{cena_wynajmu}' WHERE `car`.`id` = '{id}';");
+                    Console.WriteLine("Edytowano");
+                    Thread.Sleep(4000);
+                    Console.Clear();
+                    break;
+                case "4":
+                    Console.WriteLine("Podaj aktualny status");
+                    string status=Console.ReadLine();
+                    sql_1 = ($"UPDATE `car` SET `status` = '{status}' WHERE `car`.`id` = '{id}';");
+                    Console.WriteLine("Edytowano");
+                    Thread.Sleep(4000);
+                    Console.Clear();
+                    break;
+                case "5":
+                    Console.Clear();
+                    return true;
+                default:
+                    Console.Clear();
+                    Console.WriteLine("Zly wybor");
+                    goto start;
+
+            }
+            
+             using var cmd1 = new MySqlCommand(sql_1, con);
+             cmd1.ExecuteNonQuery();
+             
+            return true;
         }
 
     }
