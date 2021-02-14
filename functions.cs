@@ -119,14 +119,20 @@ namespace Functions
             rdr.Read();
     
             Console.WriteLine("Wybrales: \n{0} {1} \nRok {2} Przebieg {3} Km ", rdr.GetString(1), rdr.GetString(2), rdr.GetString(3), rdr.GetString(4));
+            Console.WriteLine("\nCena kupna:{0} zl \nCena wynajmu:{1} zl\n", rdr.GetString(5), rdr.GetString(6));
             back:
-            Console.WriteLine("Wybierz opcje:\n 1. Zakup \n2.Wynajem");
+            Console.WriteLine("Wybierz opcje:\n1.Zakup \n2.Wynajem");
             string choose = Console.ReadLine();
 
             switch(choose){
 
                 case "1":
                     if(buy(id)){
+                        search();
+                    }
+                    break;
+                case "2":
+                    if(rent(id,rdr.GetString(6))){
                         search();
                     }
                     break;
@@ -169,6 +175,41 @@ namespace Functions
             Console.Clear();
 
             con.Close();
+
+            return true;
+
+        }
+
+        public bool rent(string id,string cost){
+
+            Console.WriteLine("Wypozyczenie\n");
+            Console.WriteLine("Podaj imie i nazwisko");
+
+            string name=Console.ReadLine();
+
+            Console.WriteLine("Na ile miesiecy?");
+            int how_much=Convert.ToInt32(Console.ReadLine());
+
+            DateTime now = DateTime.Now;
+            DateTime modifiedDatetime = now.AddMonths(how_much);
+
+            using var con = new MySqlConnection(connectmysql());
+            con.Open();
+            string sql_1 = ($"INSERT INTO `rent` (`id`, `id_car`, `name_buyer`,`do_kiedy`) VALUES (NULL, '{id}', '{name}','{modifiedDatetime}');");
+            string sql_2 = ($"UPDATE `car` SET `status` = 'wynajety' WHERE `car`.`id` = '{id}';");
+
+            using var cmd1 = new MySqlCommand(sql_1, con);
+            using var cmd2 = new MySqlCommand(sql_2, con);
+
+            cmd1.ExecuteNonQuery();
+            cmd2.ExecuteNonQuery();
+
+            int result = Int32.Parse(cost);
+
+            Console.WriteLine($"Auto wynajete do {modifiedDatetime} za {how_much*result} zl \n");
+
+            con.Close();
+            Thread.Sleep(4000);
 
             return true;
 

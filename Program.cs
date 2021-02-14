@@ -9,7 +9,7 @@ namespace wypo
         static void Main(string[] args)
         {
             Function ft = new Function();
-
+            
 
             Console.WriteLine("Witamy w salonie samochodowym \n");
             start:
